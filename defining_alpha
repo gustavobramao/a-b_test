@@ -1,0 +1,50 @@
+#### Dummy example with 2 groups A/B composed of 20 observations each of Average order value.
+
+group <- c("a","a","a","a","a","a","a","a","a","a","a","a","a","a","a","a","a","a","a","a",
+           "b","b","b","b","b","b","b","b","b","b","b","b","b","b", "b", "b", "b", "b", "b", "b")
+
+aov <- c(100,100,100,100,100,100,100,100,200,200,200,200,300,300,400,400,500,500,600,700,
+         700,700,700,700,700,700,700,700,600,600,600,600,600,500,500,400,300,200,200,100)     
+
+df <- cbind(group, aov)           
+df <- as.data.frame(df)           
+
+# Overlaid histograms
+
+ggplot(df, aes(x=aov, fill=group)) +
+  stat_count(width = 0.5, alpha=.5, position="dodge")
+        
+# Null hypothesis <- target group A
+# Alternative hypothesis (reject the null) <- target group B
+
+ 
+# Decision rule if AOV above 500 select alternative hypothesis B and reject null.
+# Inference, defining hypothesis: with a 10% significance If the AOV is above 500$ only 10% chance to accept the null (target group A), hence should reject the null and go with the Alternative (target group B)
+
+
+# Start by calculating the proportion of users above 500$ in the group A. 
+
+x <- df %>% filter(aov>=500 & group =="a")
+x <- nrow(x)
+
+df_a <- df %>% filter(group =="a")
+n <- nrow(df)
+
+#### P_hat also known as Best Estimate: Divide the x number of user above 500$ AOV and the sample size n
+p_hat <- x/n
+
+### construct 95% confidence interval
+CI <- 1.96*sqrt(p_hat*1-p_hat*p_hat)/n
+
+confi <- function(x) {
+  
+  print(p_hat-CI);
+  print(p_hat+CI);
+  
+}
+
+p_value <- confi(p_hat) 
+
+#### In Plain English 95% confidence interval quantifies a range of reasonable value for our parameter within the sample.
+#### Based on our sample of 20 users who purchased in group A, with 95% confidence, we estimate between 8.5% and 11.5% of all such users who purchase above 500$ AOV.
+
